@@ -2,13 +2,14 @@
 // @name         GitHub markdown toc
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  try to take over the world!
+// @description  Add table of content
 // @author       You
 // @match        https://github.com/*
-// @grant        none
+// @grant        GM_registerMenuCommand
 // ==/UserScript==
 
 (function () {
+  'use strict';
   const addToc = () => {
     const textArea = document.getElementsByTagName('textarea')[0];
     const value = textArea.value;
@@ -22,13 +23,5 @@
     });
     textArea.value = textArea.value.substring(0,selectionStart) + result + textArea.value.substring(selectionStart);
   };
-
-  const tocButton = document.createElement('button');
-  tocButton.innerHTML = 'toc';
-  tocButton.type = 'button';
-  tocButton.className = 'btn btn-sm hide-sm function-button';
-  tocButton.addEventListener('click', addToc);
-
-  const btnList = document.getElementById('gollum-editor-function-buttons');
-  btnList.appendChild(tocButton);
+  GM_registerMenuCommand('Add toc', addToc);
 })();
