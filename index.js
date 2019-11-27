@@ -17,7 +17,7 @@
     value.match(/#+ [^\n]*/g).forEach(h => {
       const sharpCount = h.match(/#+/)[0].length;
       const header = h.replace(/#+ /, '');
-      const link = '#' + header.replace(/ /g, '-').replace(/\//g, '').toLowerCase();
+      const link = '#' + header.replace(/ /g, '-').replace(/\/|\.|\(|\)/g, '').toLowerCase();
       result += `${' '.repeat((sharpCount - 1) * 2)}- [${header}](${link})\n`;
     });
     textArea.value = textArea.value.substring(0,selectionStart) + result + textArea.value.substring(selectionStart);
