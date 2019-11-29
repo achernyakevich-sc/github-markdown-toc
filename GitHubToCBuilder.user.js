@@ -32,7 +32,16 @@
     return result;
   }
 
-  //{can be deleted
+  const copyToClipboard = (value) => {
+    const tmp = document.createElement('textarea');
+    document.body.appendChild(tmp);
+    tmp.value = value;
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+  }
+
+  // Tests - used only for development, can be commented out or deleted
   (() => {
     const test = ({ input, output, testingFunc }) => {
       if (JSON.stringify(testingFunc(input)) !== JSON.stringify(output)) {
@@ -80,13 +89,10 @@
     testCases.forEach(test);
 
   })();
-  //can be deleted}
 
   const addToc = () => {
     const textArea = document.getElementsByTagName('textarea')[0];
-    const selectionStart = textArea.selectionStart;
-    const toc = createToc(textArea.value);
-    textArea.value = textArea.value.substring(0, selectionStart) + toc + textArea.value.substring(selectionStart);
+    copyToClipboard(createToc(textArea.value));
   };
 
   GM_registerMenuCommand('Add toc', addToc);
