@@ -41,12 +41,12 @@
     document.body.removeChild(tmp);
   }
 
-  const addToC = () => {
+  const putToCToClipboard = () => {
     const textArea = document.getElementsByTagName('textarea')[0];
     copyToClipboard(createToC(textArea.value));
   };
 
-  GM_registerMenuCommand('Add ToC', addToC);
+  GM_registerMenuCommand('Put ToC to clipboard', putToCToClipboard);
 
   // Tests - used only for development, can be commented out or deleted
   (() => {
