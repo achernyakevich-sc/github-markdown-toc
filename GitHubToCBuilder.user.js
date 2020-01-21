@@ -41,6 +41,13 @@
     document.body.removeChild(tmp);
   }
 
+  const addToc = () => {
+    const textArea = document.getElementsByTagName('textarea')[0];
+    copyToClipboard(createToc(textArea.value));
+  };
+
+  GM_registerMenuCommand('Add toc', addToc);
+
   // Tests - used only for development, can be commented out or deleted
   (() => {
     const test = ({ input, output, testingFunc }) => {
@@ -87,13 +94,6 @@
       },
     ];
     testCases.forEach(test);
-
   })();
 
-  const addToc = () => {
-    const textArea = document.getElementsByTagName('textarea')[0];
-    copyToClipboard(createToc(textArea.value));
-  };
-
-  GM_registerMenuCommand('Add toc', addToc);
 })();
