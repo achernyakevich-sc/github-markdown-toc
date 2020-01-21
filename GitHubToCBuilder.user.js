@@ -21,7 +21,7 @@
 
   const getHeadersLines = value => value.match(/#+\s+[^\r\n]*/g);
 
-  const createToc = value => {
+  const createToC = value => {
     let result = '';
     getHeadersLines(value).forEach(line => {
       const sharpCount = getSharpCount(line);
@@ -41,12 +41,12 @@
     document.body.removeChild(tmp);
   }
 
-  const addToc = () => {
+  const addToC = () => {
     const textArea = document.getElementsByTagName('textarea')[0];
-    copyToClipboard(createToc(textArea.value));
+    copyToClipboard(createToC(textArea.value));
   };
 
-  GM_registerMenuCommand('Add toc', addToc);
+  GM_registerMenuCommand('Add ToC', addToC);
 
   // Tests - used only for development, can be commented out or deleted
   (() => {
@@ -90,7 +90,7 @@
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
         output: '- [header1](#header1)\n    - [header2 some text](#header2-some-text)\n  - [header3](#header3)\n',
-        testingFunc: createToc,
+        testingFunc: createToC,
       },
     ];
     testCases.forEach(test);
