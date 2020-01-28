@@ -13,20 +13,87 @@
 (function () {
   'use strict';
 
-  const addToc = () => {
-    let textArea = document.getElementsByTagName('textarea')[0];
-    let value = textArea.value;
-    let selectionStart = textArea.selectionStart;
-    let result = '';
+  const getAnchor = text => '#' + text.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
 
-    value.match(/#+ [^\n]*/g).forEach(h => {
-      let sharpCount = h.match(/#+/)[0].length;
-      let header = h.replace(/#+ /, '');
-      let link = '#' + header.replace(/ /g, '-').replace(/\/|\.|\(|\)/g, '').toLowerCase();
-      result += `${' '.repeat((sharpCount - 1) * 2)}- [${header}](${link})\n`;
+  const getSharpCount = value => value.match(/#+/) ? value.match(/#+/)[0].length : 0;
+
+  const getHeaderText = headerLine => headerLine.replace(/#+\s+/, '');
+
+  const getHeadersLines = value => value.match(/#+\s+[^\r\n]*/g);
+
+  const createToC = value => {
+    let result = '';
+    getHeadersLines(value).forEach(line => {
+      const sharpCount = getSharpCount(line);
+      const text = getHeaderText(line);
+      const anchor = getAnchor(text);
+      result += `${' '.repeat((sharpCount - 1) * 2)}- [${text}](${anchor})\n`;
     });
-    textArea.value = textArea.value.substring(0,selectionStart) + result + textArea.value.substring(selectionStart);
+    return result;
+  }
+
+  const copyToClipboard = (value) => {
+    const tmp = document.createElement('textarea');
+    document.body.appendChild(tmp);
+    tmp.value = value;
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+  }
+
+  const putToCToClipboard = () => {
+    const textArea = document.getElementsByTagName('textarea')[0];
+    copyToClipboard(createToC(textArea.value));
   };
 
-  GM_registerMenuCommand('Add toc', addToc);
+  GM_registerMenuCommand('Put ToC to clipboard', putToCToClipboard);
+
+  // Tests - used only for development, can be commented out or deleted
+  (() => {
+    const test = ({ input, output, testingFunc }) => {
+      if (JSON.stringify(testingFunc(input)) !== JSON.stringify(output)) {
+        GM_log(`${testingFunc.name}(${JSON.stringify(input)}) !== ${JSON.stringify(output)}`);
+        GM_log(`${testingFunc.name}(${JSON.stringify(input)}) ==  ${JSON.stringify(testingFunc(input))}`);
+      }
+    };
+    const testCases = [
+      {
+        input: '   123',
+        output: 0,
+        testingFunc: getSharpCount,
+      },
+      {
+        input: '#########################               123',
+        output: 25,
+        testingFunc: getSharpCount,
+      },
+      {
+        input: 'ab(c)?:;\'0!@$-%/\\1_^|23\tDEF',
+        output: '#abc0-1_23--def',
+        testingFunc: getAnchor,
+      },
+      {
+        input: '### header1',
+        output: 'header1',
+        testingFunc: getHeaderText,
+      },
+      {
+        input: '# header1 and some text',
+        output: 'header1 and some text',
+        testingFunc: getHeaderText,
+      },
+      {
+        input: `# header1\r\n### header2 some text\n## header3\r\n`,
+        output: ['# header1', '### header2 some text', '## header3'],
+        testingFunc: getHeadersLines,
+      },
+      {
+        input: `# header1\r\n### header2 some text\n## header3\r\n`,
+        output: '- [header1](#header1)\n    - [header2 some text](#header2-some-text)\n  - [header3](#header3)\n',
+        testingFunc: createToC,
+      },
+    ];
+    testCases.forEach(test);
+  })();
+
 })();
