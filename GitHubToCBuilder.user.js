@@ -13,29 +13,29 @@
 (function () {
   'use strict';
 
-  const getAnchor = text => {
-    return '#' + text.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
+  const getHeaderAnchor = headerLine => {
+    return '#' + headerLine.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
   }
 
-  const getSharpCount = value => {
-    return value.match(/#+/) ? value.match(/#+/)[0].length : 0;
+  const getHeaderDepth = headerLine => {
+    return headerLine.match(/#+/) ? headerLine.match(/#+/)[0].length : 0;
   }
 
   const getHeaderText = headerLine => {
     return headerLine.replace(/#+\s+/, '');
   }
 
-  const getHeadersLines = value => {
-    return value.match(/#+\s+[^\r\n]*/g);
+  const getHeadersLines = mdText => {
+    return mdText.match(/#+\s+[^\r\n]*/g);
   }
 
-  const createToC = value => {
+  const createToC = mdText => {
     let result = '';
-    getHeadersLines(value).forEach(line => {
-      const sharpCount = getSharpCount(line);
-      const text = getHeaderText(line);
-      const anchor = getAnchor(text);
-      result += `${' '.repeat((sharpCount - 1) * 2)}- [${text}](${anchor})\n`;
+    getHeadersLines(mdText).forEach(line => {
+      const hDepth = getHeaderDepth(line);
+      const hText = getHeaderText(line);
+      const hAnchor = getHeaderAnchor(hText);
+      result += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
     });
     return result;
   }
@@ -68,17 +68,17 @@
       {
         input: '   123',
         output: 0,
-        testingFunc: getSharpCount,
+        testingFunc: getHeaderDepth,
       },
       {
         input: '#########################               123',
         output: 25,
-        testingFunc: getSharpCount,
+        testingFunc: getHeaderDepth,
       },
       {
         input: 'ab(c)?:;\'0!@$-%/\\1_^|23\tDEF',
         output: '#abc0-1_23--def',
-        testingFunc: getAnchor,
+        testingFunc: getHeaderAnchor,
       },
       {
         input: '### header1',
