@@ -13,16 +13,16 @@
 (function () {
   'use strict';
 
-  const getHeaderAnchor = headerLine => {
-    return '#' + headerLine.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
-  }
-
   const getHeaderDepth = headerLine => {
     return headerLine.match(/#+/) ? headerLine.match(/#+/)[0].length : 0;
   }
 
   const getHeaderText = headerLine => {
     return headerLine.replace(/#+\s+/, '');
+  }
+
+  const getHeaderAnchor = headerText => {
+    return '#' + headerText.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
   }
 
   const getHeadersLines = mdText => {
