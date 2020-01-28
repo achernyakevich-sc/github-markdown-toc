@@ -13,13 +13,21 @@
 (function () {
   'use strict';
 
-  const getAnchor = text => '#' + text.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
+  const getAnchor = text => {
+    return '#' + text.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
+  }
 
-  const getSharpCount = value => value.match(/#+/) ? value.match(/#+/)[0].length : 0;
+  const getSharpCount = value => {
+    return value.match(/#+/) ? value.match(/#+/)[0].length : 0;
+  }
 
-  const getHeaderText = headerLine => headerLine.replace(/#+\s+/, '');
+  const getHeaderText = headerLine => {
+    return headerLine.replace(/#+\s+/, '');
+  }
 
-  const getHeadersLines = value => value.match(/#+\s+[^\r\n]*/g);
+  const getHeadersLines = value => {
+    return value.match(/#+\s+[^\r\n]*/g);
+  }
 
   const createToC = value => {
     let result = '';
