@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHubToCBuilder
 // @namespace    https://scand.com/
-// @version      0.1
+// @version      0.1.1
 // @description  ToC builder for GitHub markdown markup docs (.md and Wiki)
 // @author       vkuleshov-sc
 // @author       achernyakevich-sc
@@ -30,31 +30,31 @@
     return mdText.match(/#+\s+[^\r\n]*/g);
   }
 
-  const createToC = mdText => {
-    let result = '';
+  const getToCForMarkdownMarkupText = mdText => {
+    let toc = '';
     getHeadersLines(mdText).forEach(line => {
       const hDepth = getHeaderDepth(line);
       const hText = getHeaderText(line);
       const hAnchor = getHeaderAnchor(hText);
-      result += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
+      toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
     });
-    return result;
+    return toc;
   }
 
   const getWikiTextAreaElement = () => {
     return document.getElementById('gollum-editor-body');
   };
 
-  const putToCToClipboard = () => {
+  const copyToCForMarkdownMarkupTextToClipboard = () => {
     const textArea = getWikiTextAreaElement();
     if (textArea) {
-      GM_setClipboard(createToC(textArea.value));
+      GM_setClipboard(getToCForMarkdownMarkupText(textArea.value));
     }
     alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
   };
 
   if (getWikiTextAreaElement()) {
-    GM_registerMenuCommand('Build ToC for Wiki content (editor->clipboard)', putToCToClipboard);
+    GM_registerMenuCommand('Build ToC for Wiki content (editor->clipboard)', copyToCForMarkdownMarkupTextToClipboard);
   }
 
   // Tests - used only for development, can be commented out or deleted
@@ -99,7 +99,7 @@
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
         output: '- [header1](#header1)\n    - [header2 some text](#header2-some-text)\n  - [header3](#header3)\n',
-        testingFunc: createToC,
+        testingFunc: getToCForMarkdownMarkupText,
       },
     ];
     testCases.forEach(test);
