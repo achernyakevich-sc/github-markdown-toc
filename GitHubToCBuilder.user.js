@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHubToCBuilder
 // @namespace    https://scand.com/
-// @version      0.1.2
+// @version      0.1.3
 // @description  ToC builder for GitHub markdown markup docs (.md and Wiki)
 // @author       vkuleshov-sc
 // @author       achernyakevich-sc
@@ -32,12 +32,15 @@
 
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
-    getHeadersLines(mdText).forEach(line => {
-      const hDepth = getHeaderDepth(line);
-      const hText = getHeaderText(line);
-      const hAnchor = getHeaderAnchor(hText);
-      toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
-    });
+    const headerLines = getHeadersLines(mdText);
+    if (headerLines) {
+      headerLines.forEach(line => {
+        const hDepth = getHeaderDepth(line);
+        const hText = getHeaderText(line);
+        const hAnchor = getHeaderAnchor(hText);
+        toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
+      });
+    }
     return toc;
   }
 
