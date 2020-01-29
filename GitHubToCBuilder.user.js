@@ -8,6 +8,7 @@
 // @match        https://github.com/*
 // @grant        GM_log
 // @grant        GM_registerMenuCommand
+// @grant        GM_setClipboard
 // ==/UserScript==
 
 (function () {
@@ -40,22 +41,16 @@
     return result;
   }
 
-  const copyToClipboard = (value) => {
-    const tmp = document.createElement('textarea');
-    document.body.appendChild(tmp);
-    tmp.value = value;
-    tmp.select();
-    document.execCommand('copy');
-    document.body.removeChild(tmp);
-  }
-
   const getWikiTextAreaElement = () => {
     return document.getElementById('gollum-editor-body');
   };
 
   const putToCToClipboard = () => {
     const textArea = getWikiTextAreaElement();
-    copyToClipboard(createToC(textArea.value));
+    if (textArea) {
+      GM_setClipboard(createToC(textArea.value));
+    }
+    alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
   };
 
   if (getWikiTextAreaElement()) {
