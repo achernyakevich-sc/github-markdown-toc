@@ -49,12 +49,18 @@
     document.body.removeChild(tmp);
   }
 
+  const getWikiTextAreaElement = () => {
+    return document.getElementById('gollum-editor-body');
+  };
+
   const putToCToClipboard = () => {
-    const textArea = document.getElementsByTagName('textarea')[0];
+    const textArea = getWikiTextAreaElement();
     copyToClipboard(createToC(textArea.value));
   };
 
-  GM_registerMenuCommand('Put ToC to clipboard', putToCToClipboard);
+  if (getWikiTextAreaElement()) {
+    GM_registerMenuCommand('Build ToC for Wiki content (editor->clipboard)', putToCToClipboard);
+  }
 
   // Tests - used only for development, can be commented out or deleted
   (() => {
