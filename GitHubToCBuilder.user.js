@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHubToCBuilder
 // @namespace    https://scand.com/
-// @version      0.1.1
+// @version      0.1.2
 // @description  ToC builder for GitHub markdown markup docs (.md and Wiki)
 // @author       vkuleshov-sc
 // @author       achernyakevich-sc
@@ -53,8 +53,20 @@
     alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
   };
 
+  const copyToCForSelectedMarkdownMarkupTextToClipboard = () => {
+    const selectedText = document.getSelection().toString();
+    if (selectedText !== '') {
+      GM_setClipboard(getToCForMarkdownMarkupText(selectedText));
+      alert('ToC built from selected Markdown Markup and copied to the clipboard!');
+    } else {
+      alert('Nothing is selected!');
+    }
+  };
+
   if (getWikiTextAreaElement()) {
     GM_registerMenuCommand('Build ToC for Wiki content (editor->clipboard)', copyToCForMarkdownMarkupTextToClipboard);
+  } else {
+    GM_registerMenuCommand('Build ToC for selected Markdown Markup (selection->clipboard)', copyToCForSelectedMarkdownMarkupTextToClipboard);
   }
 
   // Tests - used only for development, can be commented out or deleted
