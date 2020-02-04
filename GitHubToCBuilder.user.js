@@ -113,6 +113,11 @@
         testingFunc: getHeadersLines,
       },
       {
+        input: `s # header1\r\n### header2 some text`,
+        output: ['### header2 some text'],
+        testingFunc: getHeadersLines,
+      },
+      {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
         output: '- [header1](#header1)\n    - [header2 some text](#header2-some-text)\n  - [header3](#header3)\n',
         testingFunc: getToCForMarkdownMarkupText,
