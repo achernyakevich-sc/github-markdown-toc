@@ -78,6 +78,7 @@
       if (JSON.stringify(testingFunc(input)) !== JSON.stringify(output)) {
         GM_log(`${testingFunc.name}(${JSON.stringify(input)}) !== ${JSON.stringify(output)}`);
         GM_log(`${testingFunc.name}(${JSON.stringify(input)}) ==  ${JSON.stringify(testingFunc(input))}`);
+        alert('Test failed, see details in console');
       }
     };
     const testCases = [
