@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHubToCBuilder
 // @namespace    https://scand.com/
-// @version      0.1.3
+// @version      0.1.4
 // @description  ToC builder for GitHub markdown markup docs (.md and Wiki)
 // @author       vkuleshov-sc
 // @author       achernyakevich-sc
