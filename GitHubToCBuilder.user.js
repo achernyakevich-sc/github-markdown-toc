@@ -27,7 +27,9 @@
   }
 
   const getHeaderLines = mdText => {
-    return mdText.split(/[\r\n]/).filter(str => str.match(/^#+\s+[^\r\n]*/g));
+    return mdText.split(/[\r\n]/).
+      filter(str => str.match(/^\s{0,3}#+\s+[^\r\n]*/g)).
+      map(str => str.trim());
   }
 
   const getToCForMarkdownMarkupText = mdText => {
