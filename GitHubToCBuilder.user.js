@@ -113,8 +113,8 @@
         testingFunc: getHeadersLines,
       },
       {
-        input: `s # header1\r\n### header2 some text`,
-        output: ['### header2 some text'],
+        input: `s # header1\r\n### header2 some text\n    # not header1\n   # header3 (some text)\n #not header2`,
+        output: ['### header2 some text', '# header3 (some text)'],
         testingFunc: getHeadersLines,
       },
       {
