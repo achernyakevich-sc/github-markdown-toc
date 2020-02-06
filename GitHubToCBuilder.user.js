@@ -26,13 +26,15 @@
     return '#' + headerText.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
   }
 
-  const getHeadersLines = mdText => {
-    return mdText.match(/#+\s+[^\r\n]*/g);
+  const getHeaderLines = mdText => {
+    return mdText.split(/[\r\n]/).
+      filter(str => str.match(/^\s{0,3}#+\s+[^\r\n]*/g)).
+      map(str => str.trim());
   }
 
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
-    const headerLines = getHeadersLines(mdText);
+    const headerLines = getHeaderLines(mdText);
     if (headerLines) {
       headerLines.forEach(line => {
         const hDepth = getHeaderDepth(line);
@@ -78,6 +80,7 @@
       if (JSON.stringify(testingFunc(input)) !== JSON.stringify(output)) {
         GM_log(`${testingFunc.name}(${JSON.stringify(input)}) !== ${JSON.stringify(output)}`);
         GM_log(`${testingFunc.name}(${JSON.stringify(input)}) ==  ${JSON.stringify(testingFunc(input))}`);
+        alert('Test failed, see details in console');
       }
     };
     const testCases = [
@@ -109,7 +112,12 @@
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
         output: ['# header1', '### header2 some text', '## header3'],
-        testingFunc: getHeadersLines,
+        testingFunc: getHeaderLines,
+      },
+      {
+        input: `s # header1\r\n### header2 some text\n    # not header1\n   # header3 (some text)\n #not header2`,
+        output: ['### header2 some text', '# header3 (some text)'],
+        testingFunc: getHeaderLines,
       },
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
