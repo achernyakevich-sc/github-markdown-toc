@@ -26,13 +26,13 @@
     return '#' + headerText.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
   }
 
-  const getHeadersLines = mdText => {
+  const getHeaderLines = mdText => {
     return mdText.split(/[\r\n]/).filter(str => str.match(/^#+\s+[^\r\n]*/g));
   }
 
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
-    const headerLines = getHeadersLines(mdText);
+    const headerLines = getHeaderLines(mdText);
     if (headerLines) {
       headerLines.forEach(line => {
         const hDepth = getHeaderDepth(line);
@@ -110,12 +110,12 @@
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
         output: ['# header1', '### header2 some text', '## header3'],
-        testingFunc: getHeadersLines,
+        testingFunc: getHeaderLines,
       },
       {
         input: `s # header1\r\n### header2 some text\n    # not header1\n   # header3 (some text)\n #not header2`,
         output: ['### header2 some text', '# header3 (some text)'],
-        testingFunc: getHeadersLines,
+        testingFunc: getHeaderLines,
       },
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
