@@ -6,7 +6,7 @@
 
 # Description
 
-This is a simple script that helps you create ToC in markup files such as README.md or wiki.
+This is a simple script that helps you create ToC in markdown files such as README.md or wiki.
 
 
 # Installation
