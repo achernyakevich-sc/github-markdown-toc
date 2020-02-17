@@ -6,7 +6,7 @@
 
 # Description
 
-This is a simple script that helps you create ToC in markdown files such as README.md or wiki.
+This is a simple script that helps you create ToC in markdown markup files such as README.md or GitHub Wiki.
 
 
 # Installation
@@ -21,14 +21,14 @@ See more details about script adding in [Guide how to add a script](https://www.
 
 ## For GitHub Wiki content
 
-1. Open the wiki editor on GitHub.
-1. Open the Tampermonkey toolbar and select "Build ToC for Wiki content".
-1. Now ToC is in your clipboard and you can paste it wherever you want.
+1. Open the Wiki editor on GitHub.
+1. Open the Tampermonkey toolbar and click on `Build ToC for Wiki content` menu item.
+1. After that, ToC will be in your clipboard, it will be accompanied by a corresponding notification.
 
 
 ## For selected Markdown Markup content
 
 1. Open the file editor on GitHub.
 1. Select the content, from which you want to create ToC.
-1. Open the Tampermonkey toolbar and select "Build ToC for selected Markdown Markup".
-1. Now ToC is in your clipboard and you can paste it wherever you want.
+1. Open the Tampermonkey toolbar and click on `Build ToC for selected Markdown Markup` menu item.
+1. After that, ToC will be in your clipboard, it will be accompanied by a corresponding notification.
