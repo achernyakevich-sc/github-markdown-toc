@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHubToCBuilder
 // @namespace    https://scand.com/
-// @version      0.1.4
+// @version      0.1.5
 // @description  ToC builder for GitHub markdown markup docs (.md and Wiki)
 // @author       vkuleshov-sc
 // @author       achernyakevich-sc
@@ -19,7 +19,9 @@
   }
 
   const getHeaderText = headerLine => {
-    return headerLine.replace(/#+\s+/, '');
+    return headerLine.replace(/#+\s+/, '')
+                     // Keep only link text
+                     .replace(/\[(.*?)\]\(.*?\)/g, '$1');
   }
 
   const getHeaderAnchor = headerText => {
@@ -107,6 +109,11 @@
       {
         input: '# header1 and some text',
         output: 'header1 and some text',
+        testingFunc: getHeaderText,
+      },
+      {
+        input: '# Header with [GitHub](https://github.com/) and [Google](https://google.com/) links',
+        output: 'Header with GitHub and Google links',
         testingFunc: getHeaderText,
       },
       {
