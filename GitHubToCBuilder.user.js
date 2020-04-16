@@ -20,7 +20,7 @@
 
   const getHeaderText = headerLine => {
     return headerLine.replace(/#+\s+/, '')
-                     // Keep only link text
+                     // For link in header we keep text only (remove URL and brackets) 
                      .replace(/\[(.*?)\]\(.*?\)/g, '$1');
   }
 
