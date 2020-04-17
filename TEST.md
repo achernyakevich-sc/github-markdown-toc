@@ -1,7 +1,9 @@
 - [ToC Example](#toc-example)
   - [Header level 2](#header-level-2)
     - [Header level 3](#header-level-3)
+    - [Subheader](#subheader)
   - [Header with GitHub and Google links](#header-with-github-and-google-links)
+    - [Subheader](#subheader-1)
 
 # ToC Example
 
@@ -13,6 +15,14 @@ Quisque ornare at augue et tincidunt. Quisque facilisis, nibh eget egestas moles
 
 Vestibulum ac dolor orci. Nullam varius porttitor convallis. Proin id suscipit magna, non suscipit velit. Integer mattis venenatis sem, at laoreet ipsum luctus eget. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.
 
+### Subheader
+
+Test subheaders with the same name.
+
 ## Header with [GitHub](https://github.com/) and [Google](https://google.com/) links
 
 There are cases when a header could contain links, e.g. to Jira-tickets.
+
+### Subheader
+
+Test subheaders with the same name.

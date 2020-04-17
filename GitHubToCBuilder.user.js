@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHubToCBuilder
 // @namespace    https://scand.com/
-// @version      0.1.5
+// @version      0.1.6
 // @description  ToC builder for GitHub markdown markup docs (.md and Wiki)
 // @author       vkuleshov-sc
 // @author       achernyakevich-sc
@@ -36,12 +36,19 @@
 
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
+    let anchors = new Map();
     const headerLines = getHeaderLines(mdText);
     if (headerLines) {
       headerLines.forEach(line => {
         const hDepth = getHeaderDepth(line);
         const hText = getHeaderText(line);
-        const hAnchor = getHeaderAnchor(hText);
+        let hAnchor = getHeaderAnchor(hText);
+        // Consider duplicate headers
+        const anchorsCount = anchors.get(hAnchor) || 0;
+        anchors.set(hAnchor, anchorsCount + 1);
+        if (anchorsCount) {
+            hAnchor += '-' + anchorsCount;
+        }
         toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
       });
     }
@@ -129,6 +136,11 @@
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
         output: '- [header1](#header1)\n    - [header2 some text](#header2-some-text)\n  - [header3](#header3)\n',
+        testingFunc: getToCForMarkdownMarkupText,
+      },
+      {
+        input: `# header\n## subheader\n# another header\n## subheader\n## header\n### subheader`,
+        output: '- [header](#header)\n  - [subheader](#subheader)\n- [another header](#another-header)\n  - [subheader](#subheader-1)\n  - [header](#header-1)\n    - [subheader](#subheader-2)\n',
         testingFunc: getToCForMarkdownMarkupText,
       },
     ];
