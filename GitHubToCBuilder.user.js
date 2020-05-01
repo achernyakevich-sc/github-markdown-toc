@@ -37,7 +37,6 @@
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
     let anchors = [];
-    let duplicateHeaders = new Map();
     const headerLines = getHeaderLines(mdText);
     if (headerLines) {
       headerLines.forEach(line => {
@@ -45,34 +44,16 @@
         const hText = getHeaderText(line);
         const hAnchor = getHeaderAnchor(hText);
 
-        // Count headers with the same anchors
+        // Check for duplication of header
         if (-1 != anchors.indexOf(hAnchor)) {
-          const header = duplicateHeaders.get(hAnchor) || {count: 1, text: hText};
-          header.count++;
           duplicateHeaders.set(hAnchor, header)
+          return { hasErrors: true; msg: "Headers duplications detected at least for: " + hText };
         } else {
           anchors.push(hAnchor);
         }
 
         toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
       });
-    }
-
-    if (duplicateHeaders.size) {
-      const limit = 10;
-      let duplicateHeadersText = '';
-      let i = 0;
-      duplicateHeaders.forEach(function(header) {
-        if (i++ >= limit) return;
-
-        duplicateHeadersText += '\n' + header.text + ' (' + header.count + ')';
-      });
-      if (duplicateHeaders.size > limit) {
-        duplicateHeadersText += '\n...\nand ' + (duplicateHeaders.size - limit) + ' other(s)';
-      }
-      alert('There are duplicate headers:' + duplicateHeadersText + '\n\nPlease fix duplicate headers and try again.');
-
-      return false;
     }
 
     return toc;
@@ -84,24 +65,26 @@
 
   const copyToCForMarkdownMarkupTextToClipboard = () => {
     const textArea = getWikiTextAreaElement();
-    let toc = '';
     if (textArea) {
-      toc = getToCForMarkdownMarkupText(textArea.value);
-      if (false !== toc) {
+      let toc = getToCForMarkdownMarkupText(textArea.value);
+      if (toc.hasErrors) {
+        alert(toc.msg);
+      } else {
         GM_setClipboard(toc);
+        alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
       }
-    }
-    if (false !== toc) {
-      alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
+    } else {
+      alert('Textarea with Markdown Markup is not detected!');
     }
   };
 
   const copyToCForSelectedMarkdownMarkupTextToClipboard = () => {
     const selectedText = document.getSelection().toString();
-    let toc = '';
     if (selectedText !== '') {
-      toc = getToCForMarkdownMarkupText(selectedText)
-      if (false !== toc) {
+      let toc = getToCForMarkdownMarkupText(selectedText)
+      if (toc.hasErrors) {
+        alert(toc.msg);
+      } else {
         GM_setClipboard(toc);
         alert('ToC built from selected Markdown Markup and copied to the clipboard!');
       }
