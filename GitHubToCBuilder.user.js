@@ -37,26 +37,28 @@
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
     let anchors = [];
+    let hasErrors = false;
     const headerLines = getHeaderLines(mdText);
     if (headerLines) {
-      headerLines.forEach(line => {
+      for (let i = 0; i < headerLines.length; i++) {
+        const line = headerLines[i];
         const hDepth = getHeaderDepth(line);
         const hText = getHeaderText(line);
         const hAnchor = getHeaderAnchor(hText);
 
         // Check for duplication of header
         if (-1 != anchors.indexOf(hAnchor)) {
-          duplicateHeaders.set(hAnchor, header)
-          return { hasErrors: true; msg: "Headers duplications detected at least for: " + hText };
-        } else {
-          anchors.push(hAnchor);
+          alert('Headers duplications detected at least for: ' + hText);
+          hasErrors = true;
+          break;
         }
 
+        anchors.push(hAnchor);
         toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
-      });
+      }
     }
 
-    return toc;
+    return hasErrors ? null : toc;
   }
 
   const getWikiTextAreaElement = () => {
@@ -65,32 +67,34 @@
 
   const copyToCForMarkdownMarkupTextToClipboard = () => {
     const textArea = getWikiTextAreaElement();
-    if (textArea) {
-      let toc = getToCForMarkdownMarkupText(textArea.value);
-      if (toc.hasErrors) {
-        alert(toc.msg);
-      } else {
-        GM_setClipboard(toc);
-        alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
-      }
-    } else {
+    if (!textArea) {
       alert('Textarea with Markdown Markup is not detected!');
+      return;
     }
+
+    const toc = getToCForMarkdownMarkupText(textArea.value);
+    if (null == toc) {
+      return;
+    }
+
+    GM_setClipboard(toc);
+    alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
   };
 
   const copyToCForSelectedMarkdownMarkupTextToClipboard = () => {
     const selectedText = document.getSelection().toString();
-    if (selectedText !== '') {
-      let toc = getToCForMarkdownMarkupText(selectedText)
-      if (toc.hasErrors) {
-        alert(toc.msg);
-      } else {
-        GM_setClipboard(toc);
-        alert('ToC built from selected Markdown Markup and copied to the clipboard!');
-      }
-    } else {
+    if (selectedText === '') {
       alert('Nothing is selected!');
+      return;
     }
+
+    let toc = getToCForMarkdownMarkupText(selectedText);
+    if (null == toc) {
+      return;
+    }
+
+    GM_setClipboard(toc);
+    alert('ToC built from selected Markdown Markup and copied to the clipboard!');
   };
 
   if (getWikiTextAreaElement()) {
