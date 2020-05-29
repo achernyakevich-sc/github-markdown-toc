@@ -48,9 +48,7 @@
 
         // Check for duplication of header
         if (-1 != anchors.indexOf(hAnchor)) {
-          alert('Headers duplications detected at least for: ' + hText);
-          hasErrors = true;
-          break;
+          return { hasErrors: true, msg: "Headers duplications detected at least for: " + hText };
         }
 
         anchors.push(hAnchor);
@@ -58,7 +56,7 @@
       }
     }
 
-    return hasErrors ? null : toc;
+    return { hasErrors: false, toc: toc };
   }
 
   const getWikiTextAreaElement = () => {
@@ -72,12 +70,13 @@
       return;
     }
 
-    const toc = getToCForMarkdownMarkupText(textArea.value);
-    if (null == toc) {
+    const result = getToCForMarkdownMarkupText(textArea.value);
+    if (result.hasErrors) {
+      alert(result.msg);
       return;
     }
 
-    GM_setClipboard(toc);
+    GM_setClipboard(result.toc);
     alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
   };
 
@@ -88,12 +87,13 @@
       return;
     }
 
-    let toc = getToCForMarkdownMarkupText(selectedText);
-    if (null == toc) {
+    const result = getToCForMarkdownMarkupText(selectedText);
+    if (result.hasErrors) {
+      alert(result.msg);
       return;
     }
 
-    GM_setClipboard(toc);
+    GM_setClipboard(result.toc);
     alert('ToC built from selected Markdown Markup and copied to the clipboard!');
   };
 
@@ -105,10 +105,15 @@
 
   // Tests - used only for development, can be commented out or deleted
   (() => {
-    const test = ({ input, output, testingFunc }) => {
-      if (JSON.stringify(testingFunc(input)) !== JSON.stringify(output)) {
+    const test = ({ input, output, testingFunc, field }) => {
+      let result = testingFunc(input);
+      if (field) {
+        result = result[field]
+      }
+
+      if (JSON.stringify(result) !== JSON.stringify(output)) {
         GM_log(`${testingFunc.name}(${JSON.stringify(input)}) !== ${JSON.stringify(output)}`);
-        GM_log(`${testingFunc.name}(${JSON.stringify(input)}) ==  ${JSON.stringify(testingFunc(input))}`);
+        GM_log(`${testingFunc.name}(${JSON.stringify(input)}) ==  ${JSON.stringify(result)}`);
         alert('Test failed, see details in console');
       }
     };
@@ -156,6 +161,7 @@
       {
         input: `# header1\r\n### header2 some text\n## header3\r\n`,
         output: '- [header1](#header1)\n    - [header2 some text](#header2-some-text)\n  - [header3](#header3)\n',
+        field: 'toc',
         testingFunc: getToCForMarkdownMarkupText,
       },
     ];
