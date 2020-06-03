@@ -70,11 +70,11 @@
     const textArea = getWikiTextAreaElement();
     if (textArea) {
       const result = getToCForMarkdownMarkupText(textArea.value);
-      if (result.hasErrors) {
-        alert(result.msg);
-      } else {
+      if (!result.hasErrors) {
         GM_setClipboard(result.toc);
         alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
+      } else {
+        alert(result.msg);
       }
     } else {
       alert('Textarea with Markdown Markup is not detected!');
@@ -85,11 +85,11 @@
     const selectedText = document.getSelection().toString();
     if (selectedText !== '') {
       const result = getToCForMarkdownMarkupText(selectedText)
-      if (result.hasErrors) {
-        alert(result.msg);
-      } else {
+      if (!result.hasErrors) {
         GM_setClipboard(result.toc);
         alert('ToC built from selected Markdown Markup and copied to the clipboard!');
+      } else {
+        alert(result.msg);
       }
     } else {
       alert('Nothing is selected!');
