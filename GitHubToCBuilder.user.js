@@ -14,6 +14,10 @@
 (function () {
   'use strict';
 
+  const ERROR_TYPES = {
+    DUPLICATED_HEADER: 'ERROR_TYPE_DUPLICATED_HEADER'
+  };
+
   const getHeaderDepth = headerLine => {
     return headerLine.match(/#+/) ? headerLine.match(/#+/)[0].length : 0;
   };
@@ -37,7 +41,7 @@
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
     let anchors = [];
-    let duplicatedHeaders = new Map();
+    let errors = [];
     const headerLines = getHeaderLines(mdText);
     if (headerLines) {
       for (let i = 0; i < headerLines.length; i++) {
@@ -50,36 +54,76 @@
         if (-1 == anchors.indexOf(hAnchor)) {
           anchors.push(hAnchor);
           toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
-        } else if (!duplicatedHeaders.get(hAnchor)) {
-          duplicatedHeaders.set(hAnchor, hText);
+        } else {
+          errors.push({
+            type: ERROR_TYPES.DUPLICATED_HEADER,
+            value: {
+              anchor: hAnchor,
+              text: hText
+            },
+            message: "Detected duplicated header"
+          });
         }
       }
     }
 
-    let errorMsg = null;
-    if (duplicatedHeaders.size) {
-      errorMsg = "Detected the following duplicated headers:\n";
-      duplicatedHeaders.forEach(function (hText) {
-        errorMsg += "\n" + hText
-      });
-    }
-
-    return { hasErrors: duplicatedHeaders.size > 0, toc: toc, msg: errorMsg };
+    return { errors: errors, toc: toc };
   };
 
   const getWikiTextAreaElement = () => {
     return document.getElementById('gollum-editor-body');
   };
 
+  const groupBy = (collection, key) => {
+    const keyProvider = (typeof key === 'function') ? key : item => { return item[key] };
+
+    let result = new Map();
+    collection.forEach(item => {
+      const itemKey = keyProvider(item);
+      const itemCollection = result.get(itemKey);
+      if (itemCollection) {
+        itemCollection.push(item);
+      } else {
+        result.set(itemKey, [item]);
+      }
+    });
+
+    return result;
+  };
+
+  const alertErrorsHandler = errors => {
+    // Group errors by type
+    groupBy(errors, 'type').forEach((errorsByType, errorType) => {
+      switch (errorType) {
+        case ERROR_TYPES.DUPLICATED_HEADER:
+          // Group duplicated titles by anchor
+          const duplicatesByAnchor = groupBy(errorsByType, error => { return error.value.anchor });
+          let errorMsg = "Detected the following duplicated headers:\n";
+          duplicatesByAnchor.forEach((errorsByAnchor) => {
+            errorMsg += "\n" + errorsByAnchor[0].value.text + " (" + (errorsByAnchor.length + 1) + ")";
+          });
+          alert(errorMsg);
+          break;
+
+        default:
+          errorsByType.forEach(error => {
+            alert(error.message);
+          });
+      }
+    });
+  };
+
+  const errorsHandlers = [alertErrorsHandler];
+
   const copyToCForMarkdownMarkupTextToClipboard = () => {
     const textArea = getWikiTextAreaElement();
     if (textArea) {
       const result = getToCForMarkdownMarkupText(textArea.value);
-      if (!result.hasErrors) {
+      if (!result.errors.length) {
         GM_setClipboard(result.toc);
         alert('ToC built from GitHub Wiki page content and copied to the clipboard!');
       } else {
-        alert(result.msg);
+        errorsHandlers.forEach(errorsHandler => errorsHandler(result.errors));
       }
     } else {
       alert('Textarea with Markdown Markup is not detected!');
@@ -90,11 +134,11 @@
     const selectedText = document.getSelection().toString();
     if (selectedText !== '') {
       const result = getToCForMarkdownMarkupText(selectedText);
-      if (!result.hasErrors) {
+      if (!result.errors.length) {
         GM_setClipboard(result.toc);
         alert('ToC built from selected Markdown Markup and copied to the clipboard!');
       } else {
-        alert(result.msg);
+        errorsHandlers.forEach(errorsHandler => errorsHandler(result.errors));
       }
     } else {
       alert('Nothing is selected!');
