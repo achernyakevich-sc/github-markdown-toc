@@ -16,29 +16,28 @@
 
   const getHeaderDepth = headerLine => {
     return headerLine.match(/#+/) ? headerLine.match(/#+/)[0].length : 0;
-  }
+  };
 
   const getHeaderText = headerLine => {
     return headerLine.replace(/#+\s+/, '')
                      // For link in header we keep text only (remove URL and brackets) 
                      .replace(/\[(.*?)\]\(.*?\)/g, '$1');
-  }
+  };
 
   const getHeaderAnchor = headerText => {
     return '#' + headerText.replace(/ /g, '-').replace(/\t/, '--').replace(/[^\d\w-_#]/g, '').toLowerCase();
-  }
+  };
 
   const getHeaderLines = mdText => {
     return mdText.split(/[\r\n]/).
       filter(str => str.match(/^\s{0,3}#+\s+[^\r\n]*/g)).
       map(str => str.trim());
-  }
+  };
 
   const getToCForMarkdownMarkupText = mdText => {
     let toc = '';
     let anchors = [];
-    let hasErrors = false;
-    let errorMsg = '';
+    let duplicatedHeaders = new Map();
     const headerLines = getHeaderLines(mdText);
     if (headerLines) {
       for (let i = 0; i < headerLines.length; i++) {
@@ -51,16 +50,22 @@
         if (-1 == anchors.indexOf(hAnchor)) {
           anchors.push(hAnchor);
           toc += `${' '.repeat((hDepth - 1) * 2)}- [${hText}](${hAnchor})\n`;
-        } else {
-          hasErrors = true;
-          errorMsg = "Headers duplications detected at least for: " + hText;
-          break;
+        } else if (!duplicatedHeaders.get(hAnchor)) {
+          duplicatedHeaders.set(hAnchor, hText);
         }
       }
     }
 
-    return { hasErrors: hasErrors, toc: toc, msg: errorMsg };
-  }
+    let errorMsg = null;
+    if (duplicatedHeaders.size) {
+      errorMsg = "Detected the following duplicated headers:\n";
+      duplicatedHeaders.forEach(function (hText) {
+        errorMsg += "\n" + hText
+      });
+    }
+
+    return { hasErrors: duplicatedHeaders.size > 0, toc: toc, msg: errorMsg };
+  };
 
   const getWikiTextAreaElement = () => {
     return document.getElementById('gollum-editor-body');
@@ -84,7 +89,7 @@
   const copyToCForSelectedMarkdownMarkupTextToClipboard = () => {
     const selectedText = document.getSelection().toString();
     if (selectedText !== '') {
-      const result = getToCForMarkdownMarkupText(selectedText)
+      const result = getToCForMarkdownMarkupText(selectedText);
       if (!result.hasErrors) {
         GM_setClipboard(result.toc);
         alert('ToC built from selected Markdown Markup and copied to the clipboard!');
